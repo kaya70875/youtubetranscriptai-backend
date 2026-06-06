@@ -104,12 +104,12 @@ async def start_background_fetching_job(
     if not channel_id:
         raise HTTPException(status_code=404, detail=f"Channel '{channel_name}' not found.")
 
-    redis = await create_pool(REDIS_CONF)
+    arq = await create_pool(REDIS_CONF)
 
     # Set a progress id for tracking progress real time with server sent events.
     progress_id = str(uuid.uuid4())
 
-    job = await redis.enqueue_job(
+    job = await arq.enqueue_job(
         "fetch_transcripts_task",
         progress_id,
         channel_id,
