@@ -66,8 +66,10 @@ async def fetch_all_transcripts_with_metadata(video_ids: list[str], snippets: li
     r.set(f"progress:{progress_id}", 0)
     max_results = len(video_ids)
 
+    loop = asyncio.get_running_loop()
+
     async def run_in_thread(vid, snip):
-        return await asyncio.to_thread(fetch_transcript_with_snippet, vid, snip, progress_id, max_results)
+        return await loop.run_in_executor(executor, fetch_transcript_with_snippet, vid, snip, progress_id, max_results)
 
     tasks = [run_in_thread(vid, snip) for vid, snip in zip(video_ids, snippets)]
     results = await asyncio.gather(*tasks)
